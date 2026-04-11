@@ -6,7 +6,10 @@ import type { BodyRecordInput } from "@/schemas/bodyRecord";
 function mapRow(row: Record<string, unknown>): BodyRecord {
   return {
     id: row.id as string,
-    date: row.date as string,
+    // PostgreSQLのdate型はドライバーがDateオブジェクトとして返すため、YYYY-MM-DD文字列に変換する
+    date: row.date instanceof Date
+      ? `${row.date.getFullYear()}-${String(row.date.getMonth() + 1).padStart(2, '0')}-${String(row.date.getDate()).padStart(2, '0')}`
+      : String(row.date),
     weight_kg: Number(row.weight_kg),
     body_fat: row.body_fat != null ? Number(row.body_fat) : null,
     created_at: String(row.created_at),
