@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FitLog
 
-## Getting Started
+体重・体脂肪率を記録・可視化する Web アプリ。
 
-First, run the development server:
+## 技術スタック
+
+| カテゴリ       | 技術                        |
+| -------------- | --------------------------- |
+| フレームワーク | Next.js 16 (App Router)     |
+| 言語           | TypeScript                  |
+| DB             | Neon (PostgreSQL)           |
+| スタイリング   | Tailwind CSS                |
+| バリデーション | zod                         |
+| コード品質     | ESLint / Prettier           |
+
+## セットアップ
+
+### 1. パッケージインストール
+
+```bash
+npm install
+```
+
+### 2. 環境変数の設定
+
+`.env.local.example` をコピーして `.env.local` を作成し、Neon の接続文字列を設定する。
+
+```bash
+cp .env.local.example .env.local
+```
+
+### 3. DB セットアップ
+
+[Neon コンソール](https://console.neon.tech) の SQL Editor で `db/schema.sql` を実行してテーブルを作成する。
+
+### 4. 開発サーバー起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) で確認。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ディレクトリ構成
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+├── actions/          # Server Actions（データ更新）
+│   ├── bodyRecord.ts
+│   └── goal.ts
+├── app/              # App Router
+│   ├── layout.tsx
+│   ├── page.tsx      # Server Component（データ取得）
+│   └── global-error.tsx
+├── components/       # UI コンポーネント
+│   ├── Dashboard.tsx
+│   ├── Chart.tsx
+│   ├── RecordList.tsx
+│   ├── RecordModal.tsx
+│   ├── SettingsModal.tsx
+│   └── ProgressBar.tsx
+├── db/
+│   └── schema.sql    # テーブル定義
+├── docs/
+│   └── specs/        # 仕様書
+├── lib/
+│   └── db.ts         # Neon クライアント
+├── types/
+│   └── index.ts      # 型定義
+└── utils/
+    └── date.ts       # 日付ユーティリティ
+```
 
-## Learn More
+## コード品質チェック
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npx tsc --noEmit
+```
