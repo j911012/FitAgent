@@ -1,4 +1,5 @@
 const WEEKDAY_JA = ['日', '月', '火', '水', '木', '金', '土'] as const;
+const WEEKDAY_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
 
 /**
  * Dateオブジェクトを日本語表記にフォーマットする
@@ -36,6 +37,18 @@ export function getRecentDates(n: number): string[] {
     dates.push(toDateString(d));
   }
   return dates;
+}
+
+/**
+ * デザインのdate-display cardで使用するパーツを返す
+ * 例: { weekday: 'Thursday', monthDay: '4月10日', year: '2026年' }
+ */
+export function getDateParts(date: Date) {
+  return {
+    weekday: WEEKDAY_EN[date.getDay()],
+    monthDay: `${date.getMonth() + 1}月${date.getDate()}日`,
+    year: `${date.getFullYear()}年`,
+  };
 }
 
 /**
