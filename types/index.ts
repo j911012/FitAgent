@@ -1,3 +1,11 @@
+// Googleプロフィール情報をDBに保存したユーザー型
+export type User = {
+  id: string;   // DBで生成したUUID
+  name: string | null;
+  email: string | null;
+  image: string | null;
+};
+
 export type BodyRecord = {
   id: string;
   date: string; // 'YYYY-MM-DD'
