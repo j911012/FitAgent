@@ -1,4 +1,4 @@
-import sql from "@/lib/db";
+import sql, { executeWithUserId } from "@/lib/db";
 import type { BodyRecord, Result } from "@/types";
 import type { BodyRecordInput } from "@/schemas/bodyRecord";
 
@@ -6,6 +6,7 @@ import type { BodyRecordInput } from "@/schemas/bodyRecord";
 function mapRow(row: Record<string, unknown>): BodyRecord {
   return {
     id: row.id as string,
+    user_id: row.user_id as string,
     // PostgreSQLのdate型はドライバーがDateオブジェクトとして返すため、YYYY-MM-DD文字列に変換する
     date: row.date instanceof Date
       ? `${row.date.getFullYear()}-${String(row.date.getMonth() + 1).padStart(2, '0')}-${String(row.date.getDate()).padStart(2, '0')}`
@@ -17,15 +18,19 @@ function mapRow(row: Record<string, unknown>): BodyRecord {
   };
 }
 
-// 全レコードを新しい順で取得する
-// 一覧表示・最新値表示・グラフ表示すべてをこの1回のクエリで賄う
-export async function fetchBodyRecords(): Promise<Result<BodyRecord[]>> {
+// ログインユーザーのレコードを新しい順で取得する
+// executeWithUserIdでNeon RLSのapp.current_user_idも設定し二重の安全網とする
+export async function fetchBodyRecords(userId: string): Promise<Result<BodyRecord[]>> {
   try {
-    const rows = await sql`
-      SELECT id, date, weight_kg, body_fat, created_at, updated_at
-      FROM body_records
-      ORDER BY date DESC
-    `;
+    const rows = await executeWithUserId(
+      userId,
+      sql`
+        SELECT id, user_id, date, weight_kg, body_fat, created_at, updated_at
+        FROM body_records
+        WHERE user_id = ${userId}
+        ORDER BY date DESC
+      `
+    );
     return { isSuccess: true, data: rows.map((row) => mapRow(row)) };
   } catch (error) {
     return {
@@ -36,18 +41,21 @@ export async function fetchBodyRecords(): Promise<Result<BodyRecord[]>> {
   }
 }
 
-// 体重記録を登録または更新する（同日レコードはUPSERT）
-// date は UNIQUE 制約があるため ON CONFLICT で上書きする
-export async function upsertBodyRecord(input: BodyRecordInput): Promise<Result<void>> {
+// ログインユーザーの体重記録を登録または更新する（同日レコードはUPSERT）
+// v1.1: UNIQUE制約が(user_id, date)に変更されたためON CONFLICTもそれに合わせる
+export async function upsertBodyRecord(input: BodyRecordInput, userId: string): Promise<Result<void>> {
   try {
-    await sql`
-      INSERT INTO body_records (date, weight_kg, body_fat)
-      VALUES (${input.date}, ${input.weight_kg}, ${input.body_fat})
-      ON CONFLICT (date) DO UPDATE
-        SET weight_kg  = EXCLUDED.weight_kg,
-            body_fat   = EXCLUDED.body_fat,
-            updated_at = now()
-    `;
+    await executeWithUserId(
+      userId,
+      sql`
+        INSERT INTO body_records (user_id, date, weight_kg, body_fat)
+        VALUES (${userId}, ${input.date}, ${input.weight_kg}, ${input.body_fat})
+        ON CONFLICT (user_id, date) DO UPDATE
+          SET weight_kg  = EXCLUDED.weight_kg,
+              body_fat   = EXCLUDED.body_fat,
+              updated_at = now()
+      `
+    );
     return { isSuccess: true, data: undefined };
   } catch (error) {
     return {
@@ -57,10 +65,14 @@ export async function upsertBodyRecord(input: BodyRecordInput): Promise<Result<v
   }
 }
 
-// 体重記録を削除する
-export async function deleteBodyRecord(id: string): Promise<Result<void>> {
+// ログインユーザーの体重記録を削除する
+// user_idを条件に加えることで他ユーザーのレコードを誤削除しない
+export async function deleteBodyRecord(id: string, userId: string): Promise<Result<void>> {
   try {
-    await sql`DELETE FROM body_records WHERE id = ${id}`;
+    await executeWithUserId(
+      userId,
+      sql`DELETE FROM body_records WHERE id = ${id} AND user_id = ${userId}`
+    );
     return { isSuccess: true, data: undefined };
   } catch (error) {
     return {

@@ -2,12 +2,19 @@ import { Suspense } from 'react';
 import { fetchBodyRecords } from '@/apis/bodyRecords.server';
 import { fetchLatestGoal } from '@/apis/goals.server';
 import Dashboard from '@/components/Dashboard';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
-// page.tsx は同期 Server Component にする（rules: 02_components）
-// Promiseをawaitせず子コンポーネントに渡してストリーミングする
-export default function Page() {
-  const bodyRecordsPromise = fetchBodyRecords();
-  const goalPromise = fetchLatestGoal();
+// (private)グループは既にdynamic renderingのため、auth()呼び出しによるSSG無効化の影響はない
+// userIdをfetch関数に渡すためasync Componentとする
+export default async function Page() {
+  // layout.tsxでセッションチェック済みだが、userIdの取得のためにここでも呼び出す
+  const session = await auth();
+  if (!session?.user?.id) redirect('/login');
+
+  const userId = session.user.id;
+  const bodyRecordsPromise = fetchBodyRecords(userId);
+  const goalPromise = fetchLatestGoal(userId);
 
   return (
     <Suspense fallback={<PageSkeleton />}>

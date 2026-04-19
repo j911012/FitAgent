@@ -8,6 +8,7 @@ export type User = {
 
 export type BodyRecord = {
   id: string;
+  user_id: string; // v1.1: ユーザー別データ分離のために追加
   date: string; // 'YYYY-MM-DD'
   weight_kg: number;
   body_fat: number | null;
@@ -17,6 +18,7 @@ export type BodyRecord = {
 
 export type Goal = {
   id: string;
+  user_id: string; // v1.1: ユーザー別データ分離のために追加
   target_weight_kg: number | null;
   target_body_fat: number | null;
   created_at: string;
