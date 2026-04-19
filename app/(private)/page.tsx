@@ -2,12 +2,19 @@ import { Suspense } from 'react';
 import { fetchBodyRecords } from '@/apis/bodyRecords.server';
 import { fetchLatestGoal } from '@/apis/goals.server';
 import Dashboard from '@/components/Dashboard';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
-// page.tsx は同期 Server Component にする（rules: 02_components）
-// Promiseをawaitせず子コンポーネントに渡してストリーミングする
-export default function Page() {
-  const bodyRecordsPromise = fetchBodyRecords();
-  const goalPromise = fetchLatestGoal();
+// (private)グループは既にdynamic renderingのため、auth()呼び出しによるSSG無効化の影響はない
+// userIdをfetch関数に渡すためasync Componentとする
+export default async function Page() {
+  // layout.tsxでセッションチェック済みだが、userIdの取得のためにここでも呼び出す
+  const session = await auth();
+  if (!session?.user?.id) redirect('/login');
+
+  const userId = session.user.id;
+  const bodyRecordsPromise = fetchBodyRecords(userId);
+  const goalPromise = fetchLatestGoal(userId);
 
   return (
     <Suspense fallback={<PageSkeleton />}>
@@ -19,8 +26,7 @@ export default function Page() {
   );
 }
 
-// 実際のレイアウト構造・寸法に合わせたスケルトン
-// Dashboard と同じ構造（ヘッダー + 左ペイン + 右ペイン）で違和感をなくす
+// ヘッダーは (private)/layout.tsx が提供するため、スケルトンは左右ペインのみ
 function PageSkeleton() {
   const pulse = 'animate-pulse';
   const block = `${pulse} rounded-[10px]`;
@@ -28,19 +34,7 @@ function PageSkeleton() {
   const faintBg = { background: 'rgba(255,255,255,0.03)' };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* ヘッダーバー */}
-      <div
-        className="flex items-center justify-between px-5 h-[46px] flex-shrink-0"
-        style={{ borderBottom: '0.5px solid rgba(255,255,255,0.05)' }}
-      >
-        <div className="flex items-center gap-2">
-          <div className={`w-[26px] h-[26px] rounded-[7px] ${pulse}`} style={dimBg} />
-          <div className={`w-14 h-3 rounded ${pulse}`} style={dimBg} />
-        </div>
-        <div className={`w-32 h-2.5 rounded ${pulse} hidden sm:block`} style={dimBg} />
-      </div>
-
+    <div className="flex flex-col h-full">
       <div className="flex flex-col md:flex-row flex-1">
         {/* PC 左ペイン */}
         <aside
