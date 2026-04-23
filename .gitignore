@@ -12,6 +12,10 @@
 
 # testing
 /coverage
+/playwright-report
+/test-results
+# 認証済みセッションファイルはリポジトリに含めない
+e2e/fixtures/.auth/
 
 # next.js
 /.next/

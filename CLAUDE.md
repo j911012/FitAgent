@@ -4,7 +4,7 @@
 
 **v1.1 MVP**
 
-仕様の詳細はすべて `docs/specs/v1.1_requirements.md` を参照すること。
+仕様の詳細はすべて `docs/specs/v1.2_requirements.md` を参照すること。
 実装前に必ず仕様書を確認し、乖離しないようにする。
 
 ## ルールファイル
