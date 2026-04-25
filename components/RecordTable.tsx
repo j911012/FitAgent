@@ -75,15 +75,17 @@ export default function RecordTable({ records, latestId, onEdit }: Props) {
           : formatShortDate(record.date);
 
         const rowCls = `grid items-center py-2.5 border-b border-white/[.04] last:border-b-0 ${
-          isLatest ? 'bg-[rgba(124,58,237,0.05)] rounded-[6px] px-2 -mx-2' : ''
+          isLatest ? 'rounded-[6px] px-2 -mx-2' : ''
         }`;
-        const dateCls = isToday ? 'text-violet-400 font-medium' : 'text-white/45';
+        const rowStyle = isLatest ? { background: 'var(--red-soft)' } : {};
+        const dateCls = isToday ? 'font-medium' : 'text-white/45';
+        const dateStyle = isToday ? { color: 'var(--red)' } : {};
 
         return (
           <div key={record.id}>
             {/* PC 行 */}
-            <div className={`hidden md:grid ${rowCls}`} style={{ gridTemplateColumns: PC_COLS, gap: '8px' }}>
-              <span className={`text-[13px] ${dateCls}`}>{dateLabel}</span>
+            <div className={`hidden md:grid ${rowCls}`} style={{ gridTemplateColumns: PC_COLS, gap: '8px', ...rowStyle }}>
+              <span className={`text-[13px] ${dateCls}`} style={dateStyle}>{dateLabel}</span>
               <span className="text-[13px] font-medium text-white/80 text-right">
                 {record.weight_kg.toFixed(1)} kg
               </span>
@@ -91,18 +93,18 @@ export default function RecordTable({ records, latestId, onEdit }: Props) {
                 {record.body_fat !== null ? `${record.body_fat.toFixed(1)} %` : '—'}
               </span>
               <div className="flex items-center justify-end gap-2.5">
-                <button onClick={() => onEdit(record)} className="text-white/[.18] hover:text-violet-400 transition-colors" aria-label="編集">
+                <button onClick={() => onEdit(record)} className="text-white/[.18] hover:text-(--red) transition-colors" aria-label="編集">
                   <EditIcon />
                 </button>
-                <button onClick={() => handleDelete(record.id)} disabled={isPending} className="text-white/[.12] hover:text-red-400 transition-colors disabled:opacity-40" aria-label="削除">
+                <button onClick={() => handleDelete(record.id)} disabled={isPending} className="text-white/[.12] hover:text-(--red) transition-colors disabled:opacity-40" aria-label="削除">
                   <DeleteIcon />
                 </button>
               </div>
             </div>
 
             {/* SP 行 */}
-            <div className={`grid md:hidden ${rowCls}`} style={{ gridTemplateColumns: SP_COLS, gap: '6px' }}>
-              <span className={`text-[12px] ${dateCls}`}>
+            <div className={`grid md:hidden ${rowCls}`} style={{ gridTemplateColumns: SP_COLS, gap: '6px', ...rowStyle }}>
+              <span className={`text-[12px] ${dateCls}`} style={dateStyle}>
                 {isToday ? '今日' : formatShortDate(record.date)}
               </span>
               <span className="text-[12px] font-medium text-white/80 text-right">
@@ -112,10 +114,10 @@ export default function RecordTable({ records, latestId, onEdit }: Props) {
                 {record.body_fat !== null ? `${record.body_fat.toFixed(1)}%` : '—'}
               </span>
               <div className="flex items-center justify-end gap-2">
-                <button onClick={() => onEdit(record)} className="text-white/[.18] hover:text-violet-400 transition-colors" aria-label="編集">
+                <button onClick={() => onEdit(record)} className="text-white/[.18] hover:text-(--red) transition-colors" aria-label="編集">
                   <EditIcon />
                 </button>
-                <button onClick={() => handleDelete(record.id)} disabled={isPending} className="text-white/[.12] hover:text-red-400 transition-colors disabled:opacity-40" aria-label="削除">
+                <button onClick={() => handleDelete(record.id)} disabled={isPending} className="text-white/[.12] hover:text-(--red) transition-colors disabled:opacity-40" aria-label="削除">
                   <DeleteIcon />
                 </button>
               </div>

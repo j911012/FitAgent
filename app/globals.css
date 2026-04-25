@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* ── Surfaces ── */
+  --bg:   #0A0A0B;
+  --bg-1: #111116;
+  --bg-2: #16161C;
+  --bg-3: #1D1D25;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* ── Borders ── */
+  --line:   rgba(255, 255, 255, 0.06);
+  --line-2: rgba(255, 255, 255, 0.10);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ── Text ── */
+  --fg:   #F4F4F6;
+  --fg-2: rgba(255, 255, 255, 0.72);
+  --fg-3: rgba(255, 255, 255, 0.48);
+  --fg-4: rgba(255, 255, 255, 0.32);
+
+  /* ── Accent: Red (primary) ── */
+  --red:      oklch(0.68 0.22 18);
+  --red-2:    oklch(0.58 0.20 18);
+  --red-soft: oklch(0.68 0.22 18 / 0.14);
+
+  /* ── Accent: Purple (secondary) ── */
+  --purple:      oklch(0.68 0.22 305);
+  --purple-2:    oklch(0.58 0.20 305);
+  --purple-soft: oklch(0.68 0.22 305 / 0.14);
+
+  /* ── Semantic ── */
+  --green: oklch(0.78 0.18 155);
+  --amber: oklch(0.80 0.17 75);
+  --blue:  oklch(0.72 0.17 235);
 }
 
 body {
-  background: #080810;
-  color: rgba(255, 255, 255, 0.85);
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans, "Noto Sans JP", -apple-system, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.005em;
+}
+
+/* 数値表示用モノスペースクラス */
+.num {
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace);
+  font-feature-settings: "tnum";
+  letter-spacing: -0.01em;
 }

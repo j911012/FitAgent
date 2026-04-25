@@ -24,37 +24,40 @@ export default function LeftPane({
     <div className="flex flex-col gap-3.5 p-5 h-full">
       {/* 日付カード */}
       <div
-        className="rounded-[11px] px-4 py-3.5"
+        className="rounded-[18px] px-4 py-3.5"
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "0.5px solid rgba(255,255,255,0.06)",
+          background: "var(--bg-1)",
+          border: "1px solid var(--line)",
         }}
       >
-        <div className="text-[12px] text-white/30 mb-1">{weekday}</div>
-        <div className="text-[26px] font-medium text-white/85 leading-[1.2]">
+        <div className="text-[12px] mb-1" style={{ color: "var(--fg-3)" }}>{weekday}</div>
+        <div className="num text-[26px] font-bold leading-[1.2]" style={{ color: "var(--fg)" }}>
           {monthDay}
         </div>
-        <div className="text-[12px] text-white/25 mt-1.5">{year}</div>
+        <div className="text-[12px] mt-1.5" style={{ color: "var(--fg-4)" }}>{year}</div>
       </div>
 
       {/* 体重・体脂肪率（2カラム） */}
       <div className="grid grid-cols-2 gap-2.5">
         {[
-          { label: "体重", value: weight, unit: "kg" },
-          { label: "体脂肪率", value: bodyFat, unit: "%" },
-        ].map(({ label, value, unit }) => (
+          { label: "体重", value: weight, unit: "kg", accent: "var(--red)" },
+          { label: "体脂肪率", value: bodyFat, unit: "%", accent: "var(--purple)" },
+        ].map(({ label, value, unit, accent }) => (
           <div
             key={label}
-            className="rounded-[11px] px-4 py-3.5"
+            className="rounded-[18px] px-4 py-3.5 overflow-hidden"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "0.5px solid rgba(255,255,255,0.07)",
+              position: "relative",
+              background: "var(--bg-1)",
+              border: "1px solid var(--line)",
             }}
           >
-            <div className="text-[11px] text-white/28 mb-2">{label}</div>
-            <div className="text-[32px] font-medium text-white/90 leading-none">
+            {/* コーナーグロー */}
+            <div style={{ position: "absolute", top: -24, right: -16, width: 100, height: 100, borderRadius: "50%", background: `radial-gradient(circle, ${accent}, transparent 65%)`, opacity: 0.18, pointerEvents: "none" }} />
+            <div className="text-[11px] mb-2" style={{ color: "var(--fg-3)" }}>{label}</div>
+            <div className="num text-[28px] font-bold leading-none" style={{ color: accent }}>
               {value !== null ? value.toFixed(1) : "---"}
-              <span className="text-[13px] text-white/35 ml-0.5">{unit}</span>
+              <span className="text-[13px] ml-0.5" style={{ color: "var(--fg-3)", fontWeight: 500 }}>{unit}</span>
             </div>
           </div>
         ))}
@@ -68,6 +71,7 @@ export default function LeftPane({
           target={goal?.target_weight_kg ?? null}
           unit="kg"
           maxDiff={20}
+          tone="red"
         />
         <ProgressBar
           label="体脂肪率"
@@ -75,6 +79,7 @@ export default function LeftPane({
           target={goal?.target_body_fat ?? null}
           unit="%"
           maxDiff={10}
+          tone="purple"
         />
       </div>
 
@@ -83,8 +88,8 @@ export default function LeftPane({
         {/* 記録ボタン */}
         <button
           onClick={onOpenRecordModal}
-          className="flex items-center justify-center gap-2 rounded-[10px] py-3 text-[14px] font-medium text-white/92 w-full"
-          style={{ background: "rgba(124,58,237,0.55)" }}
+          className="flex items-center justify-center gap-2 rounded-[14px] py-3 text-[15px] font-semibold text-white w-full"
+          style={{ background: "var(--red)", boxShadow: "0 10px 24px oklch(0.68 0.22 18 / 0.35)" }}
         >
           <svg
             width="14"
@@ -103,10 +108,11 @@ export default function LeftPane({
         {/* 目標設定ボタン */}
         <button
           onClick={onOpenGoalModal}
-          className="flex items-center justify-center gap-2 rounded-[10px] py-2.5 text-[13px] font-medium text-white/38 hover:text-white/60 transition-colors w-full"
+          className="flex items-center justify-center gap-2 rounded-[10px] py-2.5 text-[13px] font-medium transition-colors w-full"
           style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "0.5px solid rgba(255,255,255,0.07)",
+            background: "var(--bg-2)",
+            border: "1px solid var(--line-2)",
+            color: "var(--fg-2)",
           }}
           aria-label="目標を設定"
         >

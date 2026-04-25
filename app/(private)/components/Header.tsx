@@ -1,44 +1,41 @@
 import Image from 'next/image';
 import { signOut } from '@/auth';
 
-// ロゴマーク（ダンベル型アイコン）- Dashboard.tsx のものと同一
-function LogoMark({ size = 28 }: { size?: number }) {
+// ブランドマーク: 赤→紫グラデーションの角丸正方形にボルトアイコン
+function BrandMark() {
   return (
     <div
-      className="flex items-center justify-center flex-shrink-0"
       style={{
-        width: size,
-        height: size,
-        background: '#1a1040',
-        borderRadius: size <= 24 ? 6 : 8,
-        border: '0.5px solid rgba(124,58,237,0.4)',
+        width: 26,
+        height: 26,
+        borderRadius: 8,
+        background: 'linear-gradient(135deg, var(--red) 0%, var(--purple) 100%)',
+        boxShadow: '0 6px 20px oklch(0.68 0.22 18 / 0.35)',
+        display: 'grid',
+        placeItems: 'center',
+        flexShrink: 0,
       }}
     >
-      <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 24 24" fill="none">
-        <rect x="1.5" y="9" width="3" height="6" rx="1" fill="#A78BFA" />
-        <rect x="4.5" y="7" width="2.5" height="10" rx="1" fill="#A78BFA" />
-        <rect x="7" y="10.5" width="10" height="3" rx="1.5" fill="#7C6AC4" />
-        <rect x="17" y="7" width="2.5" height="10" rx="1" fill="#A78BFA" />
-        <rect x="19.5" y="9" width="3" height="6" rx="1" fill="#A78BFA" />
+      {/* ⚡ ボルトアイコン */}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+        <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" />
       </svg>
     </div>
   );
 }
 
-// ユーザー画像が未設定の場合に名前のイニシャルを円形で表示するフォールバック
 function InitialsAvatar({ name }: { name?: string | null }) {
   const initial = name ? name.charAt(0).toUpperCase() : '?';
   return (
     <div
       className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[11px] font-semibold text-white flex-shrink-0"
-      style={{ background: 'rgba(124,58,237,0.55)' }}
+      style={{ background: 'var(--purple-soft)', border: '1px solid var(--line-2)' }}
     >
       {initial}
     </div>
   );
 }
 
-// Auth.js の DefaultSession['user'] は name / email / image が optional（undefined になり得る）
 type Props = {
   user: {
     id: string;
@@ -52,17 +49,24 @@ export default function Header({ user }: Props) {
   return (
     <header
       className="flex items-center justify-between px-5 h-[46px] flex-shrink-0"
-      style={{ borderBottom: '0.5px solid rgba(255,255,255,0.05)' }}
+      style={{
+        background: 'var(--bg)',
+        borderBottom: '1px solid var(--line)',
+      }}
     >
-      {/* ロゴ */}
-      <div className="flex items-center gap-2.5">
-        <LogoMark size={26} />
-        <span className="text-[14px] font-medium text-white/75">FitLog</span>
+      {/* ブランド */}
+      <div className="flex items-center gap-2">
+        <BrandMark />
+        <span
+          className="text-[13px] tracking-widest"
+          style={{ fontWeight: 800, letterSpacing: '0.08em', color: 'var(--fg)' }}
+        >
+          FIT AGENT
+        </span>
       </div>
 
       {/* ユーザー情報 + ログアウト */}
       <div className="flex items-center gap-2.5">
-        {/* アバター: Google プロフィール画像 or イニシャル */}
         {user.image ? (
           <Image
             src={user.image}
@@ -75,12 +79,13 @@ export default function Header({ user }: Props) {
           <InitialsAvatar name={user.name} />
         )}
 
-        {/* ユーザー名（スマートフォンでは非表示） */}
-        <span className="text-[13px] text-white/55 hidden sm:block truncate max-w-[120px]">
+        <span
+          className="text-[13px] hidden sm:block truncate max-w-[120px]"
+          style={{ color: 'var(--fg-3)' }}
+        >
           {user.name}
         </span>
 
-        {/* ログアウトボタン: signOut をサーバーアクションとして form action に渡す */}
         <form
           action={async () => {
             'use server';
@@ -89,7 +94,8 @@ export default function Header({ user }: Props) {
         >
           <button
             type="submit"
-            className="text-[12px] text-white/28 hover:text-white/55 transition-colors px-2 py-1 rounded-[6px] hover:bg-white/5"
+            className="text-[12px] px-2 py-1 rounded-[6px] transition-colors"
+            style={{ color: 'var(--fg-4)' }}
           >
             ログアウト
           </button>

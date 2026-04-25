@@ -73,14 +73,14 @@ export default function BodyRecordChart({ records }: Props) {
       {/* チャート凡例 */}
       <div className="flex gap-3 mb-2">
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-[7px] rounded-[1px]" style={{ background: 'rgba(124,58,237,0.55)' }} />
-          <span className="text-[10px] text-white/30">体重</span>
+          <div className="w-2.5 h-[7px] rounded-[1px]" style={{ background: 'oklch(0.68 0.22 18 / 0.6)' }} />
+          <span className="text-[10px]" style={{ color: 'var(--fg-3)' }}>体重</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="relative w-4 h-0" style={{ borderTop: '2px solid #34D399' }}>
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-[#34D399]" />
+          <div className="relative w-4 h-0" style={{ borderTop: '2px solid var(--green)' }}>
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[5px] h-[5px] rounded-full" style={{ background: 'var(--green)' }} />
           </div>
-          <span className="text-[10px] text-white/30">体脂肪率</span>
+          <span className="text-[10px]" style={{ color: 'var(--fg-3)' }}>体脂肪率</span>
         </div>
       </div>
 
@@ -105,7 +105,7 @@ export default function BodyRecordChart({ records }: Props) {
                 x={bx(i)} y={y}
                 width={BAR_W} height={barH}
                 rx={1.5}
-                fill={isToday ? 'rgba(124,58,237,0.85)' : 'rgba(124,58,237,0.32)'}
+                fill={isToday ? 'oklch(0.68 0.22 18 / 0.85)' : 'oklch(0.68 0.22 18 / 0.35)'}
               />
               {/* 今日のバーのみ上端にハイライト stripe を表示 */}
               {isToday && (
@@ -113,19 +113,19 @@ export default function BodyRecordChart({ records }: Props) {
                   x={bx(i)} y={y}
                   width={BAR_W} height={2}
                   rx={1}
-                  fill="#A78BFA"
+                  fill="var(--red)"
                 />
               )}
             </g>
           );
         })}
 
-        {/* 体脂肪率 折れ線 */}
+        {/* 体脂肪率 折れ線（var(--green)） */}
         {hasBF && bfPath && (
           <path
             d={bfPath}
             fill="none"
-            stroke="#34D399"
+            stroke="oklch(0.78 0.18 155)"
             strokeWidth={1.5}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -143,8 +143,8 @@ export default function BodyRecordChart({ records }: Props) {
               cx={cx(i)}
               cy={toY(r.body_fat, minBF, maxBF)}
               r={isToday ? 3 : 2}
-              fill="#34D399"
-              stroke={isToday ? '#080810' : 'none'}
+              fill="oklch(0.78 0.18 155)"
+              stroke={isToday ? '#0A0A0B' : 'none'}
               strokeWidth={isToday ? 1.5 : 0}
             />
           );
@@ -159,7 +159,8 @@ export default function BodyRecordChart({ records }: Props) {
           return (
             <span
               key={date}
-              className={`text-[9px] ${isToday ? 'text-violet-400 font-medium' : 'text-white/20'}`}
+              className="text-[9px]"
+              style={{ color: isToday ? 'var(--red)' : 'var(--fg-4)', fontWeight: isToday ? 500 : 400 }}
             >
               {formatShortDate(date)}{isLast ? '（今日）' : ''}
             </span>
