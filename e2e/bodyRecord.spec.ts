@@ -13,14 +13,14 @@ test.describe.serial('体重記録 CRUD', () => {
     // PC左ペインとSP FABの両方に「体重を記録」ボタンが存在するため first() で取得する
     await page.getByRole('button', { name: '体重を記録' }).first().click();
 
-    // 入力欄が表示されたことでモーダルが開いたと判断する
-    await expect(page.getByPlaceholder('体重 (kg) を入力')).toBeVisible();
+    // 入力欄が表示されたことでモーダルが開いたと判断する（PC・SPで2要素あるため first() で取得）
+    await expect(page.getByPlaceholder('体重 (kg) を入力').first()).toBeVisible();
 
-    await page.getByPlaceholder('体重 (kg) を入力').fill(TEST_WEIGHT);
+    await page.getByPlaceholder('体重 (kg) を入力').first().fill(TEST_WEIGHT);
     await page.getByRole('button', { name: '保存' }).click();
 
     // モーダルが閉じたことを確認する
-    await expect(page.getByPlaceholder('体重 (kg) を入力')).not.toBeVisible();
+    await expect(page.getByPlaceholder('体重 (kg) を入力').first()).not.toBeVisible();
 
     // revalidatePath後の再レンダリングで記録一覧に体重が表示されることを確認する
     await expect(page.getByText(`${TEST_WEIGHT} kg`)).toBeVisible();
@@ -33,7 +33,7 @@ test.describe.serial('体重記録 CRUD', () => {
     // 編集モーダルが開いたことを確認する
     await expect(page.getByText('記録を編集')).toBeVisible();
 
-    await page.getByPlaceholder('体重 (kg) を入力').fill(UPDATED_WEIGHT);
+    await page.getByPlaceholder('体重 (kg) を入力').first().fill(UPDATED_WEIGHT);
     await page.getByRole('button', { name: '保存' }).click();
 
     // 更新後の体重が記録一覧に反映されることを確認する
