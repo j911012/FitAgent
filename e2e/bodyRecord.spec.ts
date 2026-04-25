@@ -22,31 +22,32 @@ test.describe.serial('体重記録 CRUD', () => {
     // モーダルが閉じたことを確認する
     await expect(page.getByPlaceholder('体重 (kg) を入力').first()).not.toBeVisible();
 
-    // revalidatePath後の再レンダリングで記録一覧に体重が表示されることを確認する
-    await expect(page.getByText(`${TEST_WEIGHT} kg`)).toBeVisible();
+    // revalidatePath後の再レンダリングで記録一覧に体重が表示されることを確認する（PC・SPで2要素あるため first()）
+    await expect(page.getByText(`${TEST_WEIGHT} kg`).first()).toBeVisible();
   });
 
   test('体重記録を編集できる', async ({ page }) => {
     // PC・SP で同じレコードに対して2つの編集ボタンが描画されるため first() で取得する
     await page.getByRole('button', { name: '編集' }).first().click();
 
-    // 編集モーダルが開いたことを確認する
-    await expect(page.getByText('記録を編集')).toBeVisible();
+    // 編集モーダルが開いたことを確認する（PC・SPで2要素あるため first()）
+    await expect(page.getByText('記録を編集').first()).toBeVisible();
 
     await page.getByPlaceholder('体重 (kg) を入力').first().fill(UPDATED_WEIGHT);
     await page.getByRole('button', { name: '保存' }).click();
 
-    // 更新後の体重が記録一覧に反映されることを確認する
-    await expect(page.getByText(`${UPDATED_WEIGHT} kg`)).toBeVisible();
+    // モーダルが閉じてからrevalidatePath後の再レンダリングを待つ（PC・SPで2要素あるため first()）
+    await expect(page.getByText('記録を編集').first()).not.toBeVisible();
+    await expect(page.getByText(`${UPDATED_WEIGHT} kg`).first()).toBeVisible();
   });
 
   test('体重記録を削除できる', async ({ page }) => {
-    await expect(page.getByText(`${UPDATED_WEIGHT} kg`)).toBeVisible();
+    await expect(page.getByText(`${UPDATED_WEIGHT} kg`).first()).toBeVisible();
 
     // PC・SP で同じレコードに対して2つの削除ボタンが描画されるため first() で取得する
     await page.getByRole('button', { name: '削除' }).first().click();
 
     // 削除後に対象の記録が一覧から消えることを確認する
-    await expect(page.getByText(`${UPDATED_WEIGHT} kg`)).not.toBeVisible();
+    await expect(page.getByText(`${UPDATED_WEIGHT} kg`).first()).not.toBeVisible();
   });
 });
