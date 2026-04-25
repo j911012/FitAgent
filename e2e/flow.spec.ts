@@ -18,24 +18,26 @@ test.describe.serial('目標設定から進捗反映までのフロー', () => {
 
   test('目標体重・目標体脂肪率を設定できる', async ({ page }) => {
     await page.getByRole('button', { name: '目標を設定' }).click();
-    await expect(page.getByPlaceholder('70.0')).toBeVisible();
+    // PC・SPで2要素あるため first() で取得する
+    await expect(page.getByPlaceholder('70.0').first()).toBeVisible();
 
-    await page.getByPlaceholder('70.0').fill(TARGET_WEIGHT);
-    await page.getByPlaceholder('15.0').fill(TARGET_BODY_FAT);
+    await page.getByPlaceholder('70.0').first().fill(TARGET_WEIGHT);
+    await page.getByPlaceholder('15.0').first().fill(TARGET_BODY_FAT);
     await page.getByRole('button', { name: '保存' }).click();
 
-    await expect(page.getByPlaceholder('70.0')).not.toBeVisible();
+    await expect(page.getByPlaceholder('70.0').first()).not.toBeVisible();
   });
 
   test('体重・体脂肪率を記録できる', async ({ page }) => {
     await page.getByRole('button', { name: '体重を記録' }).first().click();
-    await expect(page.getByPlaceholder('75.0')).toBeVisible();
+    // PC・SPで2要素あるため first() で取得する
+    await expect(page.getByPlaceholder('体重 (kg) を入力').first()).toBeVisible();
 
-    await page.getByPlaceholder('75.0').fill(CURRENT_WEIGHT);
-    await page.getByPlaceholder('18.0').fill(CURRENT_BODY_FAT);
+    await page.getByPlaceholder('体重 (kg) を入力').first().fill(CURRENT_WEIGHT);
+    await page.getByPlaceholder('体脂肪率 (%) を入力').first().fill(CURRENT_BODY_FAT);
     await page.getByRole('button', { name: '保存' }).click();
 
-    await expect(page.getByPlaceholder('75.0')).not.toBeVisible();
+    await expect(page.getByPlaceholder('体重 (kg) を入力').first()).not.toBeVisible();
   });
 
   test('ProgressBarに目標までの残り体重・体脂肪率が表示される', async ({ page }) => {
