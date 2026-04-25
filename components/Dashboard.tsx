@@ -73,6 +73,7 @@ export default function Dashboard({ bodyRecordsPromise, goalPromise }: Props) {
             latestRecord={latestRecord}
             goal={goal}
             onEdit={openEditModal}
+            onOpenGoalModal={() => setIsGoalModalOpen(true)}
           />
         </main>
       </div>
@@ -80,10 +81,10 @@ export default function Dashboard({ bodyRecordsPromise, goalPromise }: Props) {
       {/* SP FAB — pill型、左下 */}
       <button
         onClick={() => setIsRecordModalOpen(true)}
-        className="md:hidden fixed bottom-[22px] left-4 z-40 flex items-center gap-[7px] rounded-[50px] px-5 py-3 text-[14px] font-medium text-white"
+        className="md:hidden fixed bottom-[22px] left-4 z-40 flex items-center gap-[7px] rounded-[50px] px-5 py-3 text-[14px] font-semibold text-white"
         style={{
-          background: 'rgba(124,58,237,0.85)',
-          boxShadow: '0 4px 20px rgba(124,58,237,0.45)',
+          background: 'var(--red)',
+          boxShadow: '0 4px 20px oklch(0.68 0.22 18 / 0.45)',
         }}
         aria-label="体重を記録"
       >

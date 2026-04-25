@@ -4,19 +4,22 @@ type Props = {
   target: number | null;
   unit: string;
   maxDiff: number;
+  tone?: 'red' | 'purple';
 };
 
-export default function ProgressBar({ label, current, target, unit, maxDiff }: Props) {
+export default function ProgressBar({ label, current, target, unit, maxDiff, tone = 'red' }: Props) {
+  const barColor = tone === 'red' ? 'var(--red)' : 'var(--purple)';
+
   if (current === null || target === null) {
     return (
       <div className="mb-3.5">
         <div className="flex justify-between items-center mb-1.5">
-          <span className="text-[11px] text-white/28">{label}</span>
-          <span className="text-[11px] text-white/20">
+          <span className="text-[11px]" style={{ color: 'var(--fg-3)' }}>{label}</span>
+          <span className="text-[11px]" style={{ color: 'var(--fg-4)' }}>
             {current === null ? '未記録' : '目標未設定'}
           </span>
         </div>
-        <div className="h-[4px] rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
+        <div className="h-[4px] rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
       </div>
     );
   }
@@ -30,21 +33,21 @@ export default function ProgressBar({ label, current, target, unit, maxDiff }: P
   return (
     <div className="mb-3.5">
       <div className="flex justify-between items-center mb-1.5">
-        <span className="text-[11px] text-white/28">{label}</span>
+        <span className="text-[11px]" style={{ color: 'var(--fg-3)' }}>{label}</span>
         {isAchieved ? (
-          <span className="text-[11px] text-[#34D399] font-medium">達成！</span>
+          <span className="text-[11px] font-medium" style={{ color: 'var(--green)' }}>達成！</span>
         ) : (
-          <span className="text-[11px] text-violet-400 font-medium">
+          <span className="text-[11px] font-medium" style={{ color: barColor }}>
             残り {diff.toFixed(1)}{unit}
           </span>
         )}
       </div>
-      <div className="h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      <div className="h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
         <div
           className="h-full rounded-full transition-all"
           style={{
             width: `${fillPct}%`,
-            background: isAchieved ? '#34D399' : 'rgba(124,58,237,0.7)',
+            background: isAchieved ? 'var(--green)' : barColor,
           }}
         />
       </div>
