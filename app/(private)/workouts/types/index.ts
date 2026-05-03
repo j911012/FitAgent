@@ -42,3 +42,10 @@ export type WorkoutSessionSummary = WorkoutSession & {
   totalSets: number;
   totalVolume: number; // Σ(weight_kg × reps)
 };
+
+// セッション一覧の絞り込み条件
+export type WorkoutSessionFilter = {
+  exerciseId?: string;
+  range?: '7days' | '30days' | '90days' | 'all';
+  page?: number;
+};
