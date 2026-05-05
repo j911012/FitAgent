@@ -45,6 +45,7 @@ export type WorkoutSessionSummary = WorkoutSession & {
 
 // セッション一覧の絞り込み条件
 export type WorkoutSessionFilter = {
+  bodyPart?: BodyPart;
   exerciseId?: string;
   range?: '7days' | '30days' | '90days' | 'all';
   page?: number;

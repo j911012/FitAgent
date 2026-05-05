@@ -34,13 +34,14 @@ function mapSummaryRow(row: Record<string, unknown>): WorkoutSessionSummary {
 export async function fetchWorkoutSessions(
   userId: string,
   filter: WorkoutSessionFilter = {}
-): Promise<Result<WorkoutSessionSummary[]>> {
-  const { exerciseId = null, page = 1 } = filter;
+): Promise<Result<{ sessions: WorkoutSessionSummary[]; hasNextPage: boolean }>> {
+  const { exerciseId = null, bodyPart = null, page = 1 } = filter;
   const startDate = toStartDate(filter.range);
   const offset = (page - 1) * PAGE_SIZE;
 
   try {
-    // exercise_idフィルタはEXISTSサブクエリで対応し、NULLの場合は全件対象とする
+    // exercise_id・body_partフィルタはEXISTSサブクエリで対応し、NULLの場合は全件対象とする
+    // body_partフィルタはexercisesテーブルとJOINして絞り込む
     const rows = await executeWithUserId(
       userId,
       sql`
@@ -57,6 +58,14 @@ export async function fetchWorkoutSessions(
         LEFT JOIN workout_sets wset ON wset.session_id = ws.id
         WHERE ws.user_id = ${userId}
           AND (
+            ${bodyPart}::text IS NULL
+            OR EXISTS (
+              SELECT 1 FROM workout_sets ws2
+              JOIN exercises e ON e.id = ws2.exercise_id
+              WHERE ws2.session_id = ws.id AND e.body_part = ${bodyPart}
+            )
+          )
+          AND (
             ${exerciseId}::uuid IS NULL
             OR EXISTS (
               SELECT 1 FROM workout_sets
@@ -66,10 +75,13 @@ export async function fetchWorkoutSessions(
           AND (${startDate}::date IS NULL OR ws.date >= ${startDate}::date)
         GROUP BY ws.id
         ORDER BY ws.date DESC
-        LIMIT ${PAGE_SIZE} OFFSET ${offset}
+        LIMIT ${PAGE_SIZE + 1} OFFSET ${offset}
       `
     );
-    return { isSuccess: true, data: rows.map(mapSummaryRow) };
+    // PAGE_SIZE+1件取得し、超過分があれば次ページありと判定する（ちょうどPAGE_SIZE件の場合にfalseとなる）
+    const hasNextPage = rows.length > PAGE_SIZE;
+    const sessions = rows.slice(0, PAGE_SIZE).map(mapSummaryRow);
+    return { isSuccess: true, data: { sessions, hasNextPage } };
   } catch (error) {
     return {
       isSuccess: false,
