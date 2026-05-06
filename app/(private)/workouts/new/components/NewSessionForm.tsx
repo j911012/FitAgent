@@ -22,34 +22,39 @@ export default function NewSessionForm() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  // 初回実行（復元）かどうかを判定するフラグ。refで管理することでsetStateをeffect内で呼ばない
-  const isFirstRun = useRef(true);
+  // 一度でも非空のexercisesを保存したかを追跡するフラグ
+  // React StrictModeではeffectが2回実行されるため、初期マウント時の空状態でのremoveItemを防ぐ
+  const hasEverSaved = useRef(false);
   const router = useRouter();
 
-  // 初回: localStorage から復元する（復元によるstate変化が次回実行を引き起こす）
-  // 2回目以降: 種目・セットの変化を自動保存する
+  // マウント時にlocalStorageから下書きを復元する
+  // todayを依存に含めることで日付変更時（深夜0時）にも正しく動作する
   useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      try {
-        const raw = localStorage.getItem(DRAFT_KEY);
-        if (raw) {
-          const draft = JSON.parse(raw) as WorkoutDraft;
-          if (draft.date === today) {
-            dispatch({ type: 'RESTORE', exercises: draft.exercises });
-          }
-        }
-      } catch {}
-      return; // 復元によるstate変化が再度このeffectを呼ぶため、ここでは保存しない
-    }
-
     try {
-      if (state.exercises.length === 0) {
-        localStorage.removeItem(DRAFT_KEY);
-      } else {
-        const draft: WorkoutDraft = { date: today, exercises: state.exercises };
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw) as WorkoutDraft;
+        if (draft.date === today) {
+          dispatch({ type: 'RESTORE', exercises: draft.exercises });
+        }
       }
+    } catch {}
+  }, [today]);
+
+  // 種目・セットの変化を自動保存する
+  // exercises が空のとき: 一度でも保存したことがある場合のみ削除する
+  // （初期マウント時の空状態でlocalStorageを消さないための保護）
+  useEffect(() => {
+    if (state.exercises.length === 0) {
+      if (hasEverSaved.current) {
+        try { localStorage.removeItem(DRAFT_KEY); } catch {}
+      }
+      return;
+    }
+    hasEverSaved.current = true;
+    try {
+      const draft: WorkoutDraft = { date: today, exercises: state.exercises };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     } catch {}
   }, [state.exercises, today]);
 
