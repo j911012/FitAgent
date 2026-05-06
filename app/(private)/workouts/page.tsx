@@ -7,6 +7,7 @@ import { fetchExercises } from './apis/exercises.server';
 import SessionCard from './components/SessionCard';
 import FilterBar from './components/FilterBar';
 import Pagination from './components/Pagination';
+import DraftResumeBanner from './components/DraftResumeBanner';
 import type { WorkoutSessionFilter, WorkoutSessionSummary } from './types';
 import type { Result } from '@/types';
 
@@ -60,6 +61,9 @@ export default async function WorkoutsPage({ searchParams }: Props) {
           + 新しいセッション
         </Link>
       </div>
+
+      {/* localStorage確認はクライアント側のみ実行されるためSuspenseは不要 */}
+      <DraftResumeBanner />
 
       {/* useSearchParamsを使うClient ComponentはSuspenseでラップが必要 */}
       <Suspense fallback={<FilterBarSkeleton />}>

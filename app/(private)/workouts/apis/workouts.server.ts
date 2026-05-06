@@ -30,6 +30,30 @@ function mapSummaryRow(row: Record<string, unknown>): WorkoutSessionSummary {
   };
 }
 
+// 今日のセッションが存在すれば id を返す（1日1セッション制御用）
+export async function fetchTodaySession(
+  userId: string,
+  today: string
+): Promise<Result<{ id: string } | null>> {
+  try {
+    const rows = await executeWithUserId(
+      userId,
+      sql`
+        SELECT id FROM workout_sessions
+        WHERE user_id = ${userId} AND date = ${today}::date
+        LIMIT 1
+      `
+    );
+    const data = rows.length > 0 ? { id: rows[0].id as string } : null;
+    return { isSuccess: true, data };
+  } catch (error) {
+    return {
+      isSuccess: false,
+      errorMessage: error instanceof Error ? error.message : 'セッションの取得に失敗しました',
+    };
+  }
+}
+
 // セッション一覧を集計付きで取得する（フィルタ・ページネーション対応）
 export async function fetchWorkoutSessions(
   userId: string,
